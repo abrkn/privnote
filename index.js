@@ -1,7 +1,7 @@
-const { createCipher, createDecipher } = require('crypto');
 const assert = require('assert');
 const superagent = require('superagent');
 const randomstring = require('randomstring').generate;
+const GibberishAES = require('gibberish-aes/src/gibberish-aes');
 
 const PRIVNOTE_BASE_URL = 'https://privnote.com';
 const PRIVNOTE_BASE_HEADERS = { 'X-Requested-With': 'XMLHttpRequest' };
@@ -21,14 +21,12 @@ exports.createPrivnote = async (
     });
   }
 
-  const passphraseBuffer = Buffer.from(passphrase);
+  // const passphraseBuffer = Buffer.from(passphrase);
 
-  const cipher = createCipher(PRIVNOTE_CIPHER, passphraseBuffer);
-
-  const ciphertextBase64 = Buffer.concat([
-    cipher.update(body),
-    cipher.final(),
-  ]).toString('base64');
+  const ciphertextBase64 = GibberishAES.enc(
+    body.toString(),
+    passphrase.toString()
+  );
 
   const response = await superagent
     .post(`${PRIVNOTE_BASE_URL}/legacy/`)
@@ -78,12 +76,7 @@ exports.retrievePrivnote = async (idOrUrl, passphrase) => {
     throw new Error(`Note was destroyed on ${destroyed}`);
   }
 
-  const decipher = createDecipher(PRIVNOTE_CIPHER, Buffer.from(passphrase));
-
-  const cleartext = Buffer.concat([
-    decipher.update(ciphertext, 'base64'),
-    decipher.final(),
-  ]).toString('utf8');
+  const cleartext = GibberishAES.dec(ciphertext, passphrase.toString());
 
   return cleartext;
 };
