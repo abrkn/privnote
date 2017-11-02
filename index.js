@@ -80,3 +80,7 @@ exports.retrievePrivnote = async (idOrUrl, passphrase) => {
 
   return cleartext;
 };
+
+exports.isPrivnoteUrl = url =>
+  typeof url === 'string' &&
+  !!url.match(/^https:\/\/privnote.com\/[a-zA-Z0-9]+#[a-zA-Z0-9]+$/);

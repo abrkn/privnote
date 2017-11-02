@@ -1,5 +1,5 @@
 const test = require('ava');
-const { createPrivnote, retrievePrivnote } = require('./');
+const { createPrivnote, retrievePrivnote, isPrivnoteUrl } = require('./');
 
 test('without passphrase', async t => {
   const expectedBody = 'hello world';
@@ -30,4 +30,23 @@ test('with url', async t => {
   const actualBody = await retrievePrivnote(url);
 
   t.is(actualBody, expectedBody);
+});
+
+test('isPrivnoteUrl', async t => {
+  const valids = [
+    'https://privnote.com/abcde#fg123',
+    'https://privnote.com/GqX61SLm#c38LMmEZb',
+  ];
+
+  valids.forEach(_ => t.is(isPrivnoteUrl(_), true));
+
+  const invalids = [
+    'test',
+    '',
+    'http://privnote.com/abc#123',
+    'https://privnote.com/abc#123?',
+    'https://privnote.com/abc#',
+  ];
+
+  invalids.forEach(_ => t.is(isPrivnoteUrl(_), false));
 });
