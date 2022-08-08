@@ -56,6 +56,8 @@ exports.retrievePrivnote = async (idOrUrl, passphrase) => {
   assert(idOrUrl, 'idOrUrl is required');
 
   const match = idOrUrl.match(`^${PRIVNOTE_BASE_URL}\\/([^#]+)#(.+)$`);
+  
+  let id;
 
   if (match) {
     id = match[1];
